@@ -5,7 +5,7 @@
           http://www.boost.org/LICENSE_1_0.txt)
 */
 
-/******************************************************
+/*******************************************************
  *                                                     *
  *  -------------------------------------------------  *
  *  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  *
@@ -61,14 +61,8 @@
  *  -------------------------------------------------  *
  *  | 224 | 228 | 232 | 236 | 240 | 244 | 248 | 252 |  *
  *  -------------------------------------------------  *
- *  | R31 |hiddn|  CR |  LR |  PC |bchai|linkr| FCTX|  *
+ *  | R31 |  CR |  LR |  PC |bchai|linkr| FCTX| DATA|  *
  *  -------------------------------------------------  *
- *  -------------------------------------------------  *
- *  |  64 |                                         |  *
- *  -------------------------------------------------  *
- *  | 256 |                                         |  *
- *  -------------------------------------------------  *
- *  | DATA|                                         |  * 
  *  -------------------------------------------------  *
  *                                                     *
  *******************************************************/
@@ -78,7 +72,7 @@
 .align 2
 _ontop_fcontext:
     ; reserve space on stack
-    subi  r1, r1, 244
+    subi  r1, r1, 240
 
     stfd  f14, 0(r1)  ; save F14
     stfd  f15, 8(r1)  ; save F15
@@ -120,16 +114,15 @@ _ontop_fcontext:
     stw  r29, 216(r1)  ; save R29
     stw  r30, 220(r1)  ; save R30
     stw  r31, 224(r1)  ; save R31
-    stw  r3,  228(r1)  ; save hidden
 
     ; save CR
     mfcr  r0
-    stw   r0, 232(r1)
+    stw   r0, 228(r1)
     ; save LR
     mflr  r0
-    stw   r0, 236(r1)
+    stw   r0, 232(r1)
     ; save LR as PC
-    stw   r0, 240(r1)
+    stw   r0, 236(r1)
 
     ; store RSP (pointing to context-data) in R7
     mr  r7, r1
@@ -177,18 +170,17 @@ _ontop_fcontext:
     lwz  r29, 216(r1)  ; restore R29
     lwz  r30, 220(r1)  ; restore R30
     lwz  r31, 224(r1)  ; restore R31
-    lwz  r4,  228(r1)  ; restore hidden
 
     ; restore CR
-    lwz   r0, 232(r1)
+    lwz   r0, 228(r1)
     mtcr  r0
     ; restore LR
-    lwz   r0, 236(r1)
+    lwz   r0, 232(r1)
     mtlr  r0
     ; ignore PC
 
     ; adjust stack
-    addi  r1, r1, 244
+    addi  r1, r1, 240
 
     ; return transfer_t 
     stw  r7, 0(r4)
