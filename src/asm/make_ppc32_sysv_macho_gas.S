@@ -78,7 +78,7 @@
 .align 2
 _make_fcontext:
     ; save return address into R6
-    mflr  r6
+    mflr    r6
 
     ; first arg of make_fcontext() == top address of context-function
     ; shift address in R3 to lower 16 byte boundary
@@ -86,65 +86,65 @@ _make_fcontext:
 
     ; reserve space for context-data on context-stack
     ; including 64 byte of linkage + parameter area (R1 % 16 == 0)
-    subi  r3, r3, 336
+    subi    r3, r3, 336
 
     ; third arg of make_fcontext() == address of context-function
     ; store as trampoline's R31
-    stw  r5, 224(r3)
+    stw     r5, 224(r3)
 
     ; set back-chain to zero
-    li   r0, 0
-    stw  r0, 244(r3)
+    li      r0, 0
+    stw     r0, 244(r3)
 
-    mffs  f0  ; load FPSCR
-    stfd  f0, 144(r3)  ; save FPSCR
+    mffs    f0  ; load FPSCR
+    stfd    f0, 144(r3)  ; save FPSCR
 
     ; compute address of returned transfer_t
-    addi  r0, r3, 252
-    mr    r4, r0 
-    stw   r4, 228(r3) 
+    addi    r0, r3, 252
+    mr      r4, r0 
+    stw     r4, 228(r3) 
 
     ; load LR
-    mflr  r0
+    mflr    r0
     ; jump to label 1
-    bcl   20, 31, L1
+    bcl     20, 31, L1
 L1:
     ; load LR into R4
-    mflr  r4
+    mflr    r4
     ; compute abs address of trampoline, use as PC
-    addi  r5, r4, lo16(Ltrampoline - L1)
-    stw   r5, 240(r3)
+    addi    r5, r4, lo16(Ltrampoline - L1)
+    stw     r5, 240(r3)
     ; compute abs address of label finish
-    addi  r4, r4, lo16(Lfinish - L1)
+    addi    r4, r4, lo16(Lfinish - L1)
     ; restore LR
-    mtlr  r0
+    mtlr    r0
     ; save address of finish as return-address for context-function
     ; will be entered after context-function returns
-    stw  r4, 236(r3)
+    stw     r4, 236(r3)
 
     ; restore return address from R6
-    mtlr  r6
+    mtlr    r6
 
     blr  ; return pointer to context-data
 
 Ltrampoline:
     ; We get R31 = context-function, R3 = address of transfer_t,
     ; but we need to pass R3:R4 = transfer_t.
-    mtctr  r31
-    lwz  r4, 4(r3)
-    lwz  r3, 0(r3)
+    mtctr   r31
+    lwz     r4, 4(r3)
+    lwz     r3, 0(r3)
     bctr
  
 Lfinish:
     ; load address of _exit into CTR
-    bcl  20, 31, L2
+    bcl     20, 31, L2
 L2:
-    mflr  r4
-    addis  r4, r4, ha16(Lexitp - L2)
-    lwz  r4, lo16(Lexitp - L2)(r4)
-    mtctr  r4
+    mflr    r4
+    addis   r4, r4, ha16(Lexitp - L2)
+    lwz     r4, lo16(Lexitp - L2)(r4)
+    mtctr   r4
 
     ; exit code is zero
-    li  r3, 0
+    li      r3, 0
     ; exit application
-    bl  __exit
+    bl      __exit
