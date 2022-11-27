@@ -141,4 +141,9 @@ L2:
     ; exit code is zero
     li      r3, 0
     ; exit application
-    bl      __exit
+    bctr
+
+.const_data
+.align 2
+Lexitp:
+    .long   __exit
