@@ -64,6 +64,7 @@
  *  |    FCTX   |    DATA   |           |           |  *
  *  -------------------------------------------------  *
  *                                                     *
+ *******************************************************/
 
 .text
 .globl _make_fcontext
@@ -73,14 +74,14 @@ _make_fcontext:
 
     ; first arg of make_fcontext() == top address of context-function
     ; shift address in R3 to lower 16 byte boundary
-    clrrwi  r3, r3, 4
+    clrrdi  r3, r3, 4
 
     ; reserve space for context-data on context-stack
-    ; including 64 byte of linkage + parameter area (R1  16 == 0)
+    ; including 64 byte of linkage + parameter area (R1 % 16 == 0)
     subi  r3, r3, 240
 
     ; third arg of make_fcontext() == address of context-function
-    stw  r5, 176(r3)
+    std  r5, 176(r3)
 
     ; set back-chain to zero
     li   r0, 0
@@ -94,12 +95,12 @@ _make_fcontext:
     ; load LR
     mflr  r0
     ; jump to label 1
-    bl  l1
-l1:
+    bl  L1
+L1:
     ; load LR into R4
     mflr  r4
     ; compute abs address of label finish
-    addi  r4, r4, lo16((finish - .) + 4)
+    addi  r4, r4, lo16(Lfinish - L1)
     ; restore LR
     mtlr  r0
     ; save address of finish as return-address for context-function
@@ -111,13 +112,13 @@ l1:
 
     blr  ; return pointer to context-data
 
-finish:
+Lfinish:
     ; save return address into R0
     mflr  r0
     ; save return address on stack, set up stack frame
-    stw  r0, 8(r1)
-    ; allocate stack space, R1  16 == 0
-    stwu  r1, -32(r1)
+    std  r0, 8(r1)
+    ; allocate stack space, R1 % 16 == 0
+    stdu  r1, -32(r1)
 
     ; set return value to zero
     li  r3, 0

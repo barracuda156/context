@@ -74,6 +74,7 @@ _jump_fcontext:
     ; reserve space on stack
     subi  r1, r1, 184
 
+    std  r13, 0(r1)  ; save R13
     std  r14, 8(r1)  ; save R14
     std  r15, 16(r1)  ; save R15
     std  r16, 24(r1)  ; save R16
@@ -109,6 +110,7 @@ _jump_fcontext:
     ; restore RSP (pointing to context-data) from R4
     mr  r1, r4
 
+    ld  r13, 0(r1)  ; restore R13
     ld  r14, 8(r1)  ; restore R14
     ld  r15, 16(r1)  ; restore R15
     ld  r16, 24(r1)  ; restore R16
@@ -137,9 +139,9 @@ _jump_fcontext:
     mtlr  r0
 
     ; load PC
-    ld  r12, 176(r1)
+    ld  r0, 176(r1)
     ; restore CTR
-    mtctr  r12
+    mtctr  r0
 
     ; adjust stack
     addi  r1, r1, 184

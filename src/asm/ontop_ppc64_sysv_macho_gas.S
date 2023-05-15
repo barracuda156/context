@@ -74,6 +74,7 @@ _ontop_fcontext:
     ; reserve space on stack
     subi  r1, r1, 184
 
+    std  r13, 0(r1)  ; save R13
     std  r14, 8(r1)  ; save R14
     std  r15, 16(r1)  ; save R15
     std  r16, 24(r1)  ; save R16
@@ -109,6 +110,7 @@ _ontop_fcontext:
     ; restore RSP (pointing to context-data) from R4
     mr  r1, r4
 
+    ld  r13, 0(r1)  ; restore R13
     ld  r14, 8(r1)  ; restore R14
     ld  r15, 16(r1)  ; restore R15
     ld  r16, 24(r1)  ; restore R16
@@ -127,7 +129,7 @@ _ontop_fcontext:
     ld  r29, 128(r1)  ; restore R29
     ld  r30, 136(r1)  ; restore R30
     ld  r31, 144(r1)  ; restore R31
-    ld  r4,  152(r1)  ; restore hidden
+    ld  r3,  152(r1)  ; restore hidden
 
     ; restore CR
     ld  r0, 160(r1)
